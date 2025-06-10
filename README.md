@@ -1,1 +1,1 @@
-Use This project uses Godot 4.4.1
+This project uses Godot 4.4.1
