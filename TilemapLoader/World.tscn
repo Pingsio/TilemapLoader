@@ -1,0 +1,183 @@
+[gd_scene load_steps=19 format=3 uid="uid://cq45npkdfgkmk"]
+
+[ext_resource type="Script" uid="uid://ccnljxfcleng2" path="res://TilemapLoader/World.gd" id="1_20uqu"]
+[ext_resource type="Script" uid="uid://dk0i4uu7t7ex5" path="res://TilemapLoader/WorldDateSpawner.gd" id="2_nlaki"]
+[ext_resource type="TileSet" uid="uid://w6ajc8n1w00n" path="res://TilemapLoader/Assets/Tileset.tres" id="3_20uqu"]
+[ext_resource type="Texture2D" uid="uid://ci6f1jv2amqr7" path="res://TilemapLoader/Assets/default_player.png" id="5_w02ip"]
+[ext_resource type="Script" uid="uid://dmljwv2t71ree" path="res://TilemapLoader/Player.gd" id="5_yrsi4"]
+
+[sub_resource type="Shader" id="Shader_ixw1x"]
+code = "shader_type canvas_item;
+
+void fragment() {
+    vec2 uv = FRAGCOORD.xy / vec2(SCREEN_PIXEL_SIZE.x, SCREEN_PIXEL_SIZE.y);
+
+    if (uv.y > 91000.0) {
+        // 下半部分设置半透明
+        COLOR = texture(TEXTURE, UV) * vec4(1.0, 1.0, 1.0, 0.5);
+    } else {
+        // 上半部分保持不透明
+        COLOR = texture(TEXTURE, UV);
+    }
+}"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_uo8n2"]
+shader = SubResource("Shader_ixw1x")
+
+[sub_resource type="Shader" id="Shader_w02ip"]
+code = "shader_type canvas_item;
+
+uniform bool active = false;
+uniform vec4 tint : source_color = vec4(1., 1., 0., 1);
+
+void fragment() {
+	vec4 tint_copy = tint;
+	vec4 previous_color = texture(TEXTURE, UV);
+
+	if (active == true)
+	{
+		tint_copy.a = previous_color.a;
+		COLOR = tint_copy;
+	}
+}"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_t45ql"]
+shader = SubResource("Shader_w02ip")
+shader_parameter/active = false
+shader_parameter/tint = Color(1, 0.427451, 0.411765, 1)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_unifo"]
+atlas = ExtResource("5_w02ip")
+region = Rect2(0, 0, 16, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_20uqu"]
+atlas = ExtResource("5_w02ip")
+region = Rect2(16, 0, 16, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_nlaki"]
+atlas = ExtResource("5_w02ip")
+region = Rect2(32, 0, 16, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_fqn0e"]
+atlas = ExtResource("5_w02ip")
+region = Rect2(48, 0, 16, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ktn5v"]
+atlas = ExtResource("5_w02ip")
+region = Rect2(64, 0, 16, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_yrsi4"]
+atlas = ExtResource("5_w02ip")
+region = Rect2(80, 0, 16, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1q47k"]
+atlas = ExtResource("5_w02ip")
+region = Rect2(96, 0, 16, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_cn75e"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_unifo")
+}],
+"loop": false,
+"name": &"idle",
+"speed": 0.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_20uqu")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_nlaki")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_fqn0e")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ktn5v")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_yrsi4")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_1q47k")
+}],
+"loop": true,
+"name": &"run",
+"speed": 12.0
+}]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_67ov0"]
+radius = 5.0
+
+[node name="World" type="Node2D"]
+script = ExtResource("1_20uqu")
+metadata/_edit_horizontal_guides_ = [0.0]
+
+[node name="WorldDateSpawner" type="Node" parent="."]
+script = ExtResource("2_nlaki")
+
+[node name="CommonNodeRoot" type="Node2D" parent="."]
+
+[node name="TileMapLayer0" type="TileMapLayer" parent="CommonNodeRoot"]
+tile_set = ExtResource("3_20uqu")
+
+[node name="TileMapLayer1" type="TileMapLayer" parent="CommonNodeRoot"]
+tile_set = ExtResource("3_20uqu")
+
+[node name="YSortNodeRoot" type="Node2D" parent="."]
+y_sort_enabled = true
+
+[node name="TileMapLayer2" type="TileMapLayer" parent="YSortNodeRoot"]
+y_sort_enabled = true
+tile_set = ExtResource("3_20uqu")
+
+[node name="Player" type="CharacterBody2D" parent="YSortNodeRoot"]
+material = SubResource("ShaderMaterial_uo8n2")
+motion_mode = 1
+script = ExtResource("5_yrsi4")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="YSortNodeRoot/Player"]
+material = SubResource("ShaderMaterial_t45ql")
+position = Vector2(0, -8)
+sprite_frames = SubResource("SpriteFrames_cn75e")
+animation = &"idle"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="YSortNodeRoot/Player"]
+position = Vector2(0, 2)
+shape = SubResource("CircleShape2D_67ov0")
+disabled = true
+
+[node name="Camera2D" type="Camera2D" parent="YSortNodeRoot/Player"]
+zoom = Vector2(2, 2)
+
+[node name="WaitCanvasLayer" type="CanvasLayer" parent="."]
+visible = false
+
+[node name="ColorRect" type="ColorRect" parent="WaitCanvasLayer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.419813, 0.419813, 0.419813, 1)
+
+[node name="Label" type="Label" parent="WaitCanvasLayer/ColorRect"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -11.5
+offset_right = 20.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/outline_size = 32
+theme_override_font_sizes/font_size = 84
+text = "初始加载中"
+
+[connection signal="player_move" from="YSortNodeRoot/Player" to="WorldDateSpawner" method="_on_player_move"]

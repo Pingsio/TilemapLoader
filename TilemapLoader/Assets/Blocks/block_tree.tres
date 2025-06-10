@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="Block" load_steps=2 format=3 uid="uid://60sk1x247nid"]
+
+[ext_resource type="Script" uid="uid://umnld3uxo3ho" path="res://TilemapLoader/Block.gd" id="1_sn1fm"]
+
+[resource]
+script = ExtResource("1_sn1fm")
+layer = 2
+is_single_block = true
+single_texture_source = 0
+single_texture_pos = Vector2i(11, 2)
+terrain_source = 0
